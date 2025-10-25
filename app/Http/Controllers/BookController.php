@@ -12,7 +12,7 @@ class BookController extends Controller
 {
     public function index()
     {
-        // $books = Book::where('user_id', Auth::id())->get();
+        $books = \App\Models\Book::paginate(2); // ambil semua data buku
         return view('books.index', compact('books'));
     }
 
