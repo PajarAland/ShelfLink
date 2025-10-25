@@ -117,6 +117,9 @@
                         </table>
                     </div>
                 </div>
+                <div class="mt-4">
+    {{ $books->links() }}
+</div>
             @else
                 <!-- Empty State -->
                 <div class="bg-white overflow-hidden shadow-sm rounded-lg">
