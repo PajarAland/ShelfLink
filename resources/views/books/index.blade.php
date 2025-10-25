@@ -12,7 +12,7 @@
                         <div class="mb-4 sm:mb-0">
                             <h1 class="text-2xl font-bold text-gray-900 flex items-center">
                                 <i class="fas fa-book mr-3 text-indigo-600"></i>
-                                Daftar Buku
+                                Daftar Buku ShelfLink
                             </h1>
                             <p class="text-gray-600 mt-1">Kelola koleksi buku perpustakaan</p>
                         </div>
