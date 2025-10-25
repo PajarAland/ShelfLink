@@ -16,6 +16,9 @@
     <!-- Default App Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
+    <!-- Vite CSS & JS -->
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+
     <!-- Extra head stack (optional per page) -->
     @stack('head')
 </head>
