@@ -44,6 +44,9 @@ jobs:
 
     # 8. Clear and prepare Laravel caches (fixes "Please provide a valid cache path")
     - name: Prepare Laravel Environment
+      env:
+        DB_CONNECTION: sqlite
+        DB_DATABASE: database/database.sqlite
       run: |
         php artisan config:clear
         php artisan cache:clear
@@ -52,7 +55,14 @@ jobs:
         mkdir -p bootstrap/cache
         chmod -R 777 bootstrap/cache storage
 
-    # 9. Run PHPUnit or Pest tests
+    # 9. Run migrations (optional but recommended)
+    - name: Run migrations
+      env:
+        DB_CONNECTION: sqlite
+        DB_DATABASE: database/database.sqlite
+      run: php artisan migrate --force
+
+    # 10. Run PHPUnit or Pest tests
     - name: Execute tests (Unit and Feature tests) via PHPUnit/Pest
       env:
         DB_CONNECTION: sqlite
