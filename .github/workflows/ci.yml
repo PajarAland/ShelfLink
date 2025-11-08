@@ -58,6 +58,17 @@ jobs:
   sonar:
     needs: test
     runs-on: ubuntu-latest
+    services:
+      sonarqube:
+        image: sonarqube:latest
+        ports:
+          - 9000:9000
+        options: >-
+          --health-cmd="curl -f http://localhost:9000/api/system/health || exit 1"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=20
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -69,12 +80,21 @@ jobs:
   
       - name: Install Composer Dependencies
         run: composer install --no-interaction --prefer-dist
-  
+
+      - name: Wait for SonarQube to be ready
+        run: |
+          echo "⏳ Waiting for SonarQube to start..."
+          until curl -sf http://localhost:9000/api/system/status | grep -q '"status":"UP"'; do
+            echo "Still starting..."
+            sleep 5
+          done
+          echo "✅ SonarQube is ready!"
+
       - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@v3.0.0
         env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+          SONAR_TOKEN: admin
+          SONAR_HOST_URL: http://localhost:9000
         with:
           args: >
             -Dsonar.projectKey=ShelfLink
