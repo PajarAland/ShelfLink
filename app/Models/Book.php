@@ -19,4 +19,9 @@ class Book extends Model
         'published_year',
         'stock',
     ];
+
+    public function reviews()
+    {
+        return $this->hasMany(\App\Models\BookReview::class);
+    }
 }
