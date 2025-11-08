@@ -5,6 +5,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\BookController;
 use App\Http\Controllers\ReturnController;
 use App\Http\Controllers\StatisticsController;
+use App\Http\Controllers\CatalogController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -21,6 +22,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::resource('borrowings', BorrowingController::class)->only(['index', 'create', 'store']);
     Route::post('borrowings/{borrowing}/return', [BorrowingController::class, 'return'])->name('borrowings.return');
+    Route::get('/catalog', [CatalogController::class, 'index'])->name('catalog.index');
 });
 
 Route::middleware(['auth', 'admin'])->group(function () {

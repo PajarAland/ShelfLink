@@ -31,6 +31,10 @@
                     <x-nav-link :href="route('statistics.index')" :active="request()->routeIs('statistics.*')">
                         {{ __('Statistics') }}
                     </x-nav-link>
+
+                    <x-nav-link :href="route('catalog.index')" :active="request()->routeIs('catalog.*')">
+                        {{ __('Catalog') }}
+                    </x-nav-link>
                 </div>
             </div>
 
@@ -105,6 +109,14 @@
 
             <x-responsive-nav-link :href="route('admin.returns.index')" :active="request()->routeIs('admin.return.*')">
                 {{ __('Returns') }}
+            </x-responsive-nav-link>
+
+            <x-responsive-nav-link :href="route('statistics.index')" :active="request()->routeIs('statistics.*')">
+                {{ __('Statistics') }}
+            </x-responsive-nav-link>
+
+            <x-responsive-nav-link :href="route('catalog.index')" :active="request()->routeIs('catalog.*')">
+                {{ __('Catalog') }}
             </x-responsive-nav-link>
         </div>
 
