@@ -37,8 +37,7 @@ jobs:
         run: php artisan migrate --force
 
       - name: Run Tests
-        run: vendor/bin/phpunit --verbose
-
+        run: vendor/bin/phpunit
       - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@v3.0.0
         env:
