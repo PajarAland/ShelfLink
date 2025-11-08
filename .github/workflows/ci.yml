@@ -23,7 +23,12 @@ jobs:
           php-version: 8.4
           extensions: mbstring, xml, bcmath, pdo_mysql, sqlite3, pdo_sqlite, fileinfo
 
-      - name: Install Dependencies
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Composer Dependencies
         run: composer install --no-interaction --prefer-dist
 
       - name: Prepare storage dirs
@@ -37,6 +42,11 @@ jobs:
 
       - name: Generate App Key
         run: php artisan key:generate --force
+
+      - name: Build Vite Assets
+        run: |
+          npm install
+          npm run build
 
       - name: Run Migrations
         run: php artisan migrate --force
