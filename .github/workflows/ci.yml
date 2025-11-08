@@ -27,6 +27,12 @@ jobs:
       - name: Install Dependencies
         run: composer install --no-interaction --prefer-dist
 
+      - name: Prepare storage dirs
+        run: |
+          mkdir storage\framework\cache -ea 0
+          mkdir storage\framework\views -ea 0
+          mkdir storage\framework\sessions -ea 0
+
       - name: Copy .env
         run: copy .env.example .env
 
