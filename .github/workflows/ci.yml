@@ -63,11 +63,9 @@ jobs:
         image: sonarqube:latest
         ports:
           - 9000:9000
+        # remove health checks, let us manage it manually
         options: >-
-          --health-cmd="curl -f http://localhost:9000/api/system/health || exit 1"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=20
+          --name sonarqube
 
     steps:
       - name: Checkout
@@ -84,11 +82,17 @@ jobs:
       - name: Wait for SonarQube to be ready
         run: |
           echo "⏳ Waiting for SonarQube to start..."
-          until curl -sf http://localhost:9000/api/system/status | grep -q '"status":"UP"'; do
-            echo "Still starting..."
-            sleep 5
+          for i in {1..30}; do
+            if curl -sf http://localhost:9000/api/system/status | grep -q '"status":"UP"'; then
+              echo "✅ SonarQube is ready!"
+              exit 0
+            fi
+            echo "Still starting... ($i)"
+            sleep 10
           done
-          echo "✅ SonarQube is ready!"
+          echo "❌ SonarQube did not start in time" >&2
+          docker logs sonarqube
+          exit 1
 
       - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@v3.0.0
