@@ -10,6 +10,10 @@ jobs:
   build-test-sonar:
     runs-on: self-hosted
 
+    defaults:
+      run:
+        shell: bash
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -23,11 +27,8 @@ jobs:
       - name: Install Dependencies
         run: composer install --no-interaction --prefer-dist
 
-      - name: Prepare .env
-        run: |
-          copy .env.example .env
-          php artisan key:generate
-        shell: pwsh
+      - name: Generate App Key (only if needed)
+        run: php artisan key:generate --force
 
       - name: Run Migrations
         run: php artisan migrate --force
