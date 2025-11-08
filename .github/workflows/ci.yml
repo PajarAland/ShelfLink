@@ -25,8 +25,9 @@ jobs:
 
       - name: Prepare .env
         run: |
-          cp .env.example .env
+          copy .env.example .env
           php artisan key:generate
+        shell: pwsh
 
       - name: Run Migrations
         run: php artisan migrate --force
