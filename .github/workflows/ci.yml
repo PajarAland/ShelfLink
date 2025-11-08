@@ -28,7 +28,7 @@ jobs:
         run: composer install --no-interaction --prefer-dist
 
       - name: Copy .env
-        run: Copy-Item .env.example .env -Force
+        run: copy .env.example .env
 
       - name: Generate App Key
         run: php artisan key:generate --force
@@ -37,7 +37,8 @@ jobs:
         run: php artisan migrate --force
 
       - name: Run Tests
-        run: vendor/bin/phpunit
+        run: vendor/bin/phpunit -v
+
       - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@v3.0.0
         env:
