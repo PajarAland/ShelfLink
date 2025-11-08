@@ -36,6 +36,17 @@ jobs:
       - name: Copy .env
         run: copy .env.example .env
 
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Frontend Dependencies
+        run: npm ci
+
+      - name: Build Assets (Vite)
+        run: npm run build
+
       - name: Generate App Key
         run: php artisan key:generate --force
 
