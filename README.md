@@ -1,3 +1,59 @@
+<p align="center">
+  <a href="https://laravel.com" target="_blank">
+    <img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo">
+  </a>
+</p>
+
+<p align="center">
+  <!-- ✅ Badge CI dari workflow kamu sendiri -->
+  <a href="https://github.com/PajarAland/ShelfLink/actions/workflows/laravel.yml">
+    <img src="https://github.com/PajarAland/ShelfLink/actions/workflows/laravel.yml/badge.svg" alt="Laravel CI Status">
+  </a>
+
+  <!-- ✅ Badge analisis kualitas kode SonarCloud -->
+  <a href="https://sonarcloud.io/summary/new_code?id=PajarAland_ShelfLink">
+    <img src="https://sonarcloud.io/api/project_badges/measure?project=PajarAland_ShelfLink&metric=alert_status" alt="SonarCloud Quality Gate">
+  </a>
+
+  <!-- (Opsional) badge lain -->
+  <a href="https://packagist.org/packages/laravel/framework">
+    <img src="https://img.shields.io/packagist/l/laravel/framework" alt="License">
+  </a>
+</p>
+
+---
+
+## 📦 About ShelfLink
+
+**ShelfLink** adalah aplikasi manajemen koleksi buku berbasis web yang dibangun menggunakan **Laravel**.  
+Aplikasi ini memungkinkan pengguna untuk menambah, mengelola, dan mencari buku dengan mudah.
+
+---
+
+## ⚙️ CI/CD Pipeline Overview
+
+Proyek ini menggunakan **GitHub Actions** untuk menjalankan proses *Continuous Integration* otomatis, meliputi:
+
+- 🔧 **Build & Testing:**  
+  Workflow `laravel.yml` menjalankan proses:
+  - Instalasi dependensi PHP dan Node.js  
+  - Migrasi database SQLite  
+  - Eksekusi pengujian otomatis menggunakan `php artisan test`
+
+- 🧠 **Code Quality Analysis:**  
+  Workflow `SonarCloud analysis` melakukan analisis kualitas kode menggunakan **SonarCloud**, mencakup deteksi bug, code smell, dan duplikasi.
+
+---
+
+## 🧪 Testing
+
+Testing dilakukan menggunakan **PHPUnit**, bawaan Laravel.  
+Perintah yang dijalankan dalam pipeline:
+```bash
+php artisan test
+
+---
+
 <p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
 <p align="center">
