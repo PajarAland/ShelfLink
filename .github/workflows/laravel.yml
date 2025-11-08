@@ -8,26 +8,51 @@ on:
 
 jobs:
   laravel-tests:
-
     runs-on: ubuntu-latest
 
     steps:
-    - uses: shivammathur/setup-php@15c43e89cdef867065b0213be354c2841860869e
+    # 1. Setup PHP
+    - uses: shivammathur/setup-php@v2
       with:
         php-version: '8.4'
+        extensions: mbstring, bcmath, pdo_sqlite, fileinfo
+
+    # 2. Checkout source code
     - uses: actions/checkout@v4
+
+    # 3. Copy environment file
     - name: Copy .env
       run: php -r "file_exists('.env') || copy('.env.example', '.env');"
+
+    # 4. Install dependencies
     - name: Install Dependencies
-      run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+      run: composer install --no-interaction --prefer-dist --no-scripts
+
+    # 5. Generate application key
     - name: Generate key
       run: php artisan key:generate
+
+    # 6. Set correct permissions
     - name: Directory Permissions
       run: chmod -R 777 storage bootstrap/cache
+
+    # 7. Create SQLite database
     - name: Create Database
       run: |
         mkdir -p database
         touch database/database.sqlite
+
+    # 8. Clear and prepare Laravel caches (fixes "Please provide a valid cache path")
+    - name: Prepare Laravel Environment
+      run: |
+        php artisan config:clear
+        php artisan cache:clear
+        php artisan route:clear
+        php artisan view:clear
+        mkdir -p bootstrap/cache
+        chmod -R 777 bootstrap/cache storage
+
+    # 9. Run PHPUnit or Pest tests
     - name: Execute tests (Unit and Feature tests) via PHPUnit/Pest
       env:
         DB_CONNECTION: sqlite
