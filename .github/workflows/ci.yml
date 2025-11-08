@@ -7,13 +7,12 @@ on:
     branches: [ main ]
 
 jobs:
-  build-test-sonar:
-    runs-on: self-hosted
 
+  test:
+    runs-on: self-hosted
     defaults:
       run:
         shell: pwsh
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -36,17 +35,6 @@ jobs:
       - name: Copy .env
         run: copy .env.example .env
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      - name: Install Frontend Dependencies
-        run: npm ci
-
-      - name: Build Assets (Vite)
-        run: npm run build
-
       - name: Generate App Key
         run: php artisan key:generate --force
 
@@ -56,6 +44,14 @@ jobs:
       - name: Run Tests
         run: vendor/bin/phpunit --testdox
 
+
+  sonar:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
       - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@v3.0.0
         env:
