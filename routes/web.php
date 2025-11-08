@@ -7,6 +7,8 @@ use App\Http\Controllers\ReturnController;
 use App\Http\Controllers\StatisticsController;
 use App\Http\Controllers\CatalogController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ReviewController;
+
 
 Route::get('/', function () {
     return view('welcome');
@@ -23,6 +25,10 @@ Route::middleware('auth')->group(function () {
     Route::resource('borrowings', BorrowingController::class)->only(['index', 'create', 'store']);
     Route::post('borrowings/{borrowing}/return', [BorrowingController::class, 'return'])->name('borrowings.return');
     Route::get('/catalog', [CatalogController::class, 'index'])->name('catalog.index');
+    Route::get('/catalog/{book}', [CatalogController::class, 'show'])->name('catalog.show');
+    Route::post('/catalog/{book}/review', [ReviewController::class, 'store'])->name('reviews.store');
+    Route::post('/books/{book}/reviews', [ReviewController::class, 'store'])->name('reviews.store');
+    Route::get('/catalog/{book}', [BookController::class, 'show'])->name('catalog.show');
 });
 
 Route::middleware(['auth', 'admin'])->group(function () {

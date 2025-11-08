@@ -38,19 +38,18 @@
         @if ($books->count() > 0)
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 @foreach ($books as $book)
-                    <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition group">
+                    <a href="{{ route('catalog.show', $book->id) }}" class="block bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition group">
                         <!-- Book Cover -->
                         <div class="relative aspect-[3/4] bg-gray-100 overflow-hidden">
                             @if ($book->cover)
                                 <img src="{{ asset('storage/' . $book->cover) }}" 
-                                     alt="{{ $book->title }}" 
-                                     class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                                    alt="{{ $book->title }}" 
+                                    class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
                             @else
                                 <div class="w-full h-full flex items-center justify-center text-gray-400">
                                     <i class="fas fa-book text-4xl"></i>
                                 </div>
                             @endif
-                            <!-- Stock Badge -->
                             <div class="absolute top-3 right-3">
                                 <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium {{ $book->stock > 0 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
                                     {{ $book->stock > 0 ? 'Tersedia' : 'Habis' }}
@@ -83,7 +82,7 @@
                                 </span>
                             </div>
                         </div>
-                    </div>
+                    </a>
                 @endforeach
             </div>
 

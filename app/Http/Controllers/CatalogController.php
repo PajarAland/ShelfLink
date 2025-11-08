@@ -28,4 +28,10 @@ class CatalogController extends Controller
         // arahkan ke view katalog
         return view('catalog.index', compact('books'));
     }
+
+    public function show(Book $book)
+    {
+        return view('catalog.show', compact('book'));
+    }
+
 }
