@@ -1,4 +1,4 @@
-name: CI - ShelfLink (Self Hosted + SonarQube)
+name: CI - ShelfLink (Build, Test, SonarQube)
 
 on:
   push:
@@ -7,99 +7,52 @@ on:
     branches: [ main ]
 
 jobs:
-
   test:
     runs-on: self-hosted
-    defaults:
-      run:
-        shell: pwsh
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        
+
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.4
-          extensions: mbstring, xml, bcmath, pdo_mysql, sqlite3, pdo_sqlite, fileinfo
+          php-version: 8.2
+          extensions: mbstring, xml, bcmath, pdo_mysql
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      - name: Install Composer Dependencies
+      - name: Install Dependencies
         run: composer install --no-interaction --prefer-dist
 
-      - name: Prepare storage dirs
+      - name: Prepare Environment
         run: |
-          mkdir storage\framework\cache -ea 0
-          mkdir storage\framework\views -ea 0
-          mkdir storage\framework\sessions -ea 0
+          cp .env.example .env
+          php artisan key:generate
+          php artisan migrate --force
 
-      - name: Copy .env
-        run: copy .env.example .env
-
-      - name: Generate App Key
-        run: php artisan key:generate --force
-
-      - name: Build Vite Assets
-        run: |
-          npm install
-          npm run build
-
-      - name: Run Migrations
-        run: php artisan migrate --force
-
-      - name: Run Tests
+      - name: Run PHPUnit Tests
         run: vendor/bin/phpunit --testdox
-
 
   sonar:
     needs: test
-    runs-on: ubuntu-latest
-    services:
-      sonarqube:
-        image: sonarqube:latest
-        ports:
-          - 9000:9000
-        # remove health checks, let us manage it manually
-        options: >-
-          --name sonarqube
-
+    runs-on: self-hosted
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-  
+
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.4
-  
-      - name: Install Composer Dependencies
+          php-version: 8.2
+
+      - name: Install Dependencies
         run: composer install --no-interaction --prefer-dist
 
-      - name: Wait for SonarQube to be ready
-        run: |
-          echo "⏳ Waiting for SonarQube to start..."
-          for i in {1..30}; do
-            if curl -sf http://localhost:9000/api/system/status | grep -q '"status":"UP"'; then
-              echo "✅ SonarQube is ready!"
-              exit 0
-            fi
-            echo "Still starting... ($i)"
-            sleep 10
-          done
-          echo "❌ SonarQube did not start in time" >&2
-          docker logs sonarqube
-          exit 1
-
-      - name: SonarQube Scan
+      - name: SonarQube Analysis
         uses: SonarSource/sonarqube-scan-action@v3.0.0
         env:
-          SONAR_TOKEN: admin
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: http://localhost:9000
         with:
           args: >
             -Dsonar.projectKey=ShelfLink
             -Dsonar.sources=app
+            -Dsonar.php.tests.reportPath=tests
