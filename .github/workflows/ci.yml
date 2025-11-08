@@ -24,11 +24,14 @@ jobs:
           php-version: 8.4
           extensions: mbstring, xml, bcmath, pdo_mysql, fileinfo
 
+      - name: Copy .env
+        run: Copy-Item .env.example .env -Force
+
+      - name: Generate App Key
+        run: php artisan key:generate --force
+
       - name: Install Dependencies
         run: composer install --no-interaction --prefer-dist
-
-      - name: Generate App Key (only if needed)
-        run: php artisan key:generate --force
 
       - name: Run Migrations
         run: php artisan migrate --force
