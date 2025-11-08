@@ -15,7 +15,7 @@ jobs:
         uses: actions/checkout@v4
         
       - name: Setup PHP
-        uses: shivammathur/setup-php@v4
+        uses: shivammathur/setup-php@v2
         with:
           php-version: 8.4
           extensions: mbstring, xml, bcmath, pdo_mysql
@@ -27,13 +27,6 @@ jobs:
         run: |
           cp .env.example .env
           php artisan key:generate
-        env:
-          DB_CONNECTION: mysql
-          DB_HOST: 127.0.0.1
-          DB_PORT: 3306
-          DB_DATABASE: shelflink_db
-          DB_USERNAME: root
-          DB_PASSWORD: ""   # kosong jangan dihapus, cukup tetap string kosong
 
       - name: Run Migrations
         run: php artisan migrate --force
