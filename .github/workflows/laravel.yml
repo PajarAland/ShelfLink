@@ -55,11 +55,12 @@ jobs:
         DB_CONNECTION: sqlite
         DB_DATABASE: database/database.sqlite
       run: |
+        mkdir -p bootstrap/cache
+        mkdir -p storage/framework/views
         php artisan config:clear
         php artisan route:clear
         php artisan view:clear
         php artisan cache:clear
-        mkdir -p bootstrap/cache
         chmod -R 777 bootstrap/cache storage
 
     # 10. Run PHPUnit or Pest tests
