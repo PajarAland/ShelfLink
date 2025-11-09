@@ -19,7 +19,7 @@
                         <p class="text-gray-600 mt-1">Informasi lengkap tentang buku 📖</p>
                     </div>
                     <a href="{{ route('catalog.index') }}" 
-                       class="inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition">
+                    class="inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition">
                         <i class="fas fa-arrow-left mr-2"></i> Kembali ke Katalog
                     </a>
                 </div>
@@ -35,8 +35,8 @@
                     <div class="relative aspect-[3/4] bg-gray-100 overflow-hidden">
                         @if($book->cover)
                             <img src="{{ asset('storage/' . $book->cover) }}" 
-                                 alt="{{ $book->title }}"
-                                 class="w-full h-full object-cover">
+                                alt="{{ $book->title }}"
+                                class="w-full h-full object-cover">
                         @else
                             <div class="w-full h-full flex items-center justify-center text-gray-400">
                                 <i class="fas fa-book text-6xl"></i>
@@ -51,15 +51,12 @@
                     
                     <!-- Action Button -->
                     <div class="p-6">
-                        <form action="{{ route('borrowings.store', $book->id) }}" method="POST">
-                            @csrf
-                            <button type="submit" 
-                                class="w-full inline-flex items-center justify-center px-6 py-3 bg-indigo-600 border border-transparent rounded-lg font-semibold text-sm text-white uppercase tracking-widest hover:bg-indigo-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
-                                {{ $book->stock <= 0 ? 'disabled' : '' }}>
-                                <i class="fas fa-book-open mr-2"></i> 
-                                {{ $book->stock > 0 ? 'Pinjam Buku' : 'Stok Habis' }}
-                            </button>
-                        </form>
+                        <a href="{{ route('borrowings.create') }}" 
+                        class="w-full inline-flex items-center justify-center px-6 py-3 bg-indigo-600 border border-transparent rounded-lg font-semibold text-sm text-white uppercase tracking-widest hover:bg-indigo-700 transition disabled:opacity-50 disabled:cursor-not-allowed
+                        {{ $book->stock <= 0 ? 'pointer-events-none opacity-50' : '' }}">
+                            <i class="fas fa-book-open mr-2"></i> 
+                            {{ $book->stock > 0 ? 'Pinjam Buku' : 'Stok Habis' }}
+                        </a>
                     </div>
                 </div>
             </div>
@@ -151,8 +148,8 @@
                                 <div class="flex-1">
                                     <label class="block text-sm font-medium text-gray-700 mb-2">Ulasan</label>
                                     <textarea name="comment" rows="3" 
-                                              class="w-full border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm transition"
-                                              placeholder="Bagikan pengalaman membaca buku ini..."></textarea>
+                                            class="w-full border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm transition"
+                                            placeholder="Bagikan pengalaman membaca buku ini..."></textarea>
                                 </div>
                             </div>
                             <button type="submit" 
@@ -173,15 +170,38 @@
 
                 <!-- Reviews List -->
                 <div class="p-6">
-                    @if($reviews->count() > 0)
+                    @php
+                        // Pisahkan review pinned dan non-pinned
+                        $pinnedReviews = $reviews->where('is_pinned', true);
+                        $normalReviews = $reviews->where('is_pinned', false);
+                        $visibleReviews = Auth::user()?->role === 'admin'
+                            ? $pinnedReviews->merge($normalReviews)
+                            : $pinnedReviews->merge($normalReviews)->where('is_hidden', false);
+                    @endphp
+
+                    @if($visibleReviews->count() > 0)
                         <div class="space-y-6">
-                            @foreach($reviews as $review)
-                                <div class="bg-gray-50 rounded-lg p-5 hover:shadow-sm transition group">
+                            @foreach($visibleReviews as $review)
+                                <div class="bg-gray-50 rounded-lg p-5 hover:shadow-sm transition group
+                                    {{ $review->is_pinned ? 'border-l-4 border-blue-500' : '' }}">
                                     <div class="flex items-start justify-between mb-3">
                                         <div class="flex items-center space-x-3">
                                             <i class="fas fa-user-circle text-gray-400 text-2xl"></i>
                                             <div>
-                                                <p class="font-semibold text-gray-900">{{ $review->user->name }}</p>
+                                                @php
+                                                    $name = $review->user->name;
+                                                    $masked = strlen($name) > 2
+                                                        ? substr($name, 0, 1) . str_repeat('*', strlen($name) - 2) . substr($name, -1)
+                                                        : $name;
+                                                @endphp
+                                                <p class="font-semibold text-gray-900">
+                                                    {{ $masked }}
+                                                    @if($review->is_pinned)
+                                                        <span class="ml-2 text-xs text-blue-600 font-semibold">
+                                                            <i class="fas fa-thumbtack"></i> Pinned
+                                                        </span>
+                                                    @endif
+                                                </p>
                                                 <div class="flex items-center text-yellow-400 text-sm">
                                                     @for($i = 1; $i <= 5; $i++)
                                                         <i class="fa{{ $i <= $review->rating ? 's' : 'r' }} fa-star"></i>
@@ -192,7 +212,51 @@
                                         </div>
                                         <span class="text-xs text-gray-400">{{ $review->created_at->diffForHumans() }}</span>
                                     </div>
-                                    <p class="text-gray-700 text-sm leading-relaxed">{{ $review->comment }}</p>
+
+                                    <p class="text-gray-700 text-sm leading-relaxed">
+                                        {{ $review->comment }}
+                                    </p>
+
+                                    {{-- Tombol Upvote/Downvote dan Aksi Admin --}}
+                                    <div class="mt-3 flex items-center justify-between text-xs text-gray-500">
+                                        {{-- Upvote/Downvote --}}
+                                        <div class="flex items-center space-x-2">
+                                            <form action="{{ route('reviews.vote', $review->id) }}" method="POST" class="inline">
+                                                @csrf
+                                                <button name="vote" value="upvote" class="text-green-600 hover:text-green-700">
+                                                    <i class="fas fa-thumbs-up"></i>
+                                                </button>
+                                            </form>
+                                            <span class="text-green-600">{{ $review->upvotes_count ?? 0 }}</span>
+                                    <span class="text-gray-400">|</span>
+                                    <span class="text-red-600">{{ $review->downvotes_count ?? 0 }}</span>
+
+                                            <form action="{{ route('reviews.vote', $review->id) }}" method="POST" class="inline">
+                                                @csrf
+                                                <button name="vote" value="downvote" class="text-red-600 hover:text-red-700">
+                                                    <i class="fas fa-thumbs-down"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+
+                                        {{-- Aksi Admin --}}
+                                        @if(Auth::user()?->role === 'admin')
+                                            <div class="space-x-2">
+                                                <form action="{{ route('reviews.toggle', $review->id) }}" method="POST" class="inline">
+                                                    @csrf
+                                                    <button type="submit" class="text-yellow-600 hover:text-yellow-700">
+                                                        {{ $review->is_hidden ? 'Tampilkan' : 'Sembunyikan' }}
+                                                    </button>
+                                                </form>
+                                                <form action="{{ route('reviews.pin', $review->id) }}" method="POST" class="inline">
+                                                    @csrf
+                                                    <button type="submit" class="text-blue-600 hover:text-blue-700">
+                                                        {{ $review->is_pinned ? 'Unpin' : 'Pin' }}
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        @endif
+                                    </div>
                                 </div>
                             @endforeach
                         </div>
@@ -204,10 +268,6 @@
                         </div>
                     @endif
                 </div>
-            </div>
-        </div>
-
-    </div>
 </main>
 
 <style>

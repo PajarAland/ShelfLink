@@ -14,6 +14,7 @@ class BookReview extends Model
         'book_id',
         'rating',
         'comment',
+        'votes',
     ];
 
     public function user()
@@ -25,5 +26,12 @@ class BookReview extends Model
     {
         return $this->belongsTo(Book::class);
     }
+
+    public function reviewvotes()
+    {
+        return $this->hasMany(ReviewVote::class, 'review_id');
+    }
+    
+
 }
 

@@ -45,6 +45,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/catalog/{book}/review', [ReviewController::class, 'store'])->name('reviews.store');
     Route::post('/books/{book}/reviews', [ReviewController::class, 'store'])->name('reviews.store');
     Route::get('/catalog/{book}', [BookController::class, 'show'])->name('catalog.show');
+    Route::post('/reviews/{id}/vote', [ReviewController::class, 'vote'])->name('reviews.vote');
 });
 
 Route::middleware(['auth', 'admin'])->group(function () {
@@ -53,6 +54,8 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/admin/returns', [ReturnController::class, 'index'])->name('admin.returns.index');
     Route::post('/admin/returns/{id}', [ReturnController::class, 'update'])->name('admin.returns.update');
     Route::post('/admin/returns/{id}/revert', [ReturnController::class, 'revert'])->name('admin.returns.revert');
+    Route::post('/reviews/{id}/toggle', [ReviewController::class, 'toggleVisibility'])->name('reviews.toggle');
+    Route::post('/reviews/{id}/pin', [ReviewController::class, 'togglePin'])->name('reviews.pin');
 });
 
 // Route::middleware(['auth', 'admin'])->group(function () {
