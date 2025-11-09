@@ -34,6 +34,109 @@
             </div>
         </div>
 
+        <!-- Recommended Books Section -->
+        @if($recommendedBooks->count() > 0 && !request('search'))
+        <section class="mb-8">
+            <div class="flex items-center justify-between mb-6">
+                <div>
+                    <h2 class="text-xl font-bold text-gray-900 flex items-center">
+                        <i class="fas fa-star mr-2 text-yellow-500"></i>
+                        Rekomendasi Untuk Anda
+                    </h2>
+                    <p class="text-gray-600 text-sm mt-1">Buku-buku populer dan terbaru pilihan kami</p>
+                </div>
+                <div class="flex items-center space-x-2 text-sm text-gray-500">
+                    <i class="fas fa-fire text-orange-500"></i>
+                    <span>Berdasarkan popularitas & periode</span>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                @foreach($recommendedBooks as $book)
+                <a href="{{ route('catalog.show', $book->id) }}" class="block bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition group relative">
+                    <!-- Recommended Badge -->
+                    <div class="absolute top-3 left-3 z-10">
+                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                            <i class="fas fa-star mr-1 text-xs"></i> Rekomendasi
+                        </span>
+                    </div>
+                    
+                    <!-- Book Cover -->
+                    <div class="relative aspect-[3/4] bg-gray-100 overflow-hidden">
+                        @if ($book->cover)
+                            <img src="{{ asset('storage/' . $book->cover) }}" 
+                                alt="{{ $book->title }}" 
+                                class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                        @else
+                            <div class="w-full h-full flex items-center justify-center text-gray-400">
+                                <i class="fas fa-book text-4xl"></i>
+                            </div>
+                        @endif
+                        <!-- Stock Badge -->
+                        <div class="absolute top-3 right-3">
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium {{ $book->stock > 0 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
+                                {{ $book->stock > 0 ? 'Tersedia' : 'Habis' }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Book Info -->
+                    <div class="p-4">
+                        <h5 class="font-semibold text-gray-900 line-clamp-2 group-hover:text-indigo-600 transition mb-1">
+                            {{ $book->title }}
+                        </h5>
+                        <p class="text-sm text-gray-600 mb-2">{{ $book->author }}</p>
+                        
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
+                                {{ $book->category ?? 'Umum' }}
+                            </span>
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                                {{ $book->published_year ?? 'N/A' }}
+                            </span>
+                        </div>
+
+                        <div class="flex items-center justify-between text-xs text-gray-500">
+                            <span class="font-semibold {{ $book->stock > 0 ? 'text-green-600' : 'text-red-600' }}">
+                                Stok: {{ $book->stock ?? 0 }}
+                            </span>
+                            @php
+                                $borrowCount = \App\Models\Borrowing::where('book_id', $book->id)->count();
+                            @endphp
+                            @if($borrowCount > 0)
+                            <span class="text-gray-400">
+                                <i class="fas fa-users mr-1"></i>{{ $borrowCount }}x dipinjam
+                            </span>
+                            @else
+                            <span class="text-gray-400">
+                                <i class="fas fa-copy mr-1"></i>1 copy
+                            </span>
+                            @endif
+                        </div>
+                    </div>
+                </a>
+                @endforeach
+            </div>
+        </section>
+        @endif
+
+        <!-- All Books Section -->
+        <section>
+            <div class="flex items-center justify-between mb-6">
+                <div>
+                    <h2 class="text-xl font-bold text-gray-900 flex items-center">
+                        <i class="fas fa-books mr-2 text-indigo-600"></i>
+                        Semua Buku
+                    </h2>
+                    <p class="text-gray-600 text-sm mt-1">Jelajahi seluruh koleksi buku kami</p>
+                </div>
+                @if($books->count() > 0)
+                <div class="text-sm text-gray-500">
+                    Menampilkan {{ $books->count() }} dari {{ $books->total() }} buku
+                </div>
+                @endif
+            </div>
+
         <!-- Book Catalog -->
         @if ($books->count() > 0)
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -77,9 +180,18 @@
                                 <span class="font-semibold {{ $book->stock > 0 ? 'text-green-600' : 'text-red-600' }}">
                                     Stok: {{ $book->stock ?? 0 }}
                                 </span>
+                                @php
+                                    $borrowCount = \App\Models\Borrowing::where('book_id', $book->id)->count();
+                                @endphp
+                                @if($borrowCount > 0)
+                                <span class="text-gray-400">
+                                    <i class="fas fa-users mr-1"></i>{{ $borrowCount }}x dipinjam
+                                </span>
+                                @else
                                 <span class="text-gray-400">
                                     <i class="fas fa-copy mr-1"></i>1 copy
                                 </span>
+                                @endif
                             </div>
                         </div>
                     </a>
@@ -109,6 +221,7 @@
                 </div>
             </div>
         @endif
+        </section>
     </div>
 </main>
 

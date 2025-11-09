@@ -12,7 +12,7 @@ class BookController extends Controller
 {
     public function index()
     {
-        $books = \App\Models\Book::paginate(2); // ambil semua data buku
+        $books = \App\Models\Book::paginate(10); // ambil semua data buku
         return view('books.index', compact('books'));
     }
 
