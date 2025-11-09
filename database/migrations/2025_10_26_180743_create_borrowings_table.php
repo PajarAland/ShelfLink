@@ -15,7 +15,7 @@ return new class extends Migration
             $table->date('borrow_date');
             $table->date('return_deadline')->nullable(); // batas waktu pengembalian
             $table->date('return_date')->nullable();
-            $table->enum('status', ['borrowed', 'returned', 'overdue'])->default('borrowed');
+            $table->enum('status', ['borrowed', 'pending', 'overdue'])->default('borrowed');
             $table->timestamps();
         });
     }

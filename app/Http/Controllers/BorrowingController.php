@@ -93,7 +93,8 @@ class BorrowingController extends Controller
             return back()->with('error', 'Buku ini sudah dikembalikan sebelumnya.');
         }
 
-        $borrowing->update(['status' => 'returned']);
+        // Ubah status menjadi pending
+        $borrowing->update(['status' => 'pending']);
 
         // Tambahkan stok buku kembali
         $borrowing->book->increment('stock');
@@ -101,6 +102,7 @@ class BorrowingController extends Controller
         // Kirim email konfirmasi pengembalian
         Mail::to($borrowing->user->email)->send(new ReturnConfirmationMail($borrowing));
 
-        return back()->with('success', 'Buku berhasil dikembalikan. Terima kasih!');
+        return back()->with('success', 'Buku berhasil dikembalikan dan menunggu konfirmasi admin.');
     }
+
 }
