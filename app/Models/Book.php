@@ -19,4 +19,17 @@ class Book extends Model
         'published_year',
         'stock',
     ];
+
+    public function reviews()
+    {
+        return $this->hasMany(\App\Models\BookReview::class);
+    }
+
+    public function getCoverUrlAttribute()
+    {
+        return $this->cover
+            ? asset('storage/' . $this->cover)
+            : asset('images/default-book.png');
+    }
+
 }

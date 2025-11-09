@@ -12,7 +12,7 @@ class BookController extends Controller
 {
     public function index()
     {
-        $books = \App\Models\Book::paginate(2); // ambil semua data buku
+        $books = \App\Models\Book::paginate(10); // ambil semua data buku
         return view('books.index', compact('books'));
     }
 
@@ -104,5 +104,14 @@ class BookController extends Controller
     {
         $book->delete();
         return redirect()->route('books.index')->with('success', 'Buku berhasil dihapus!');
+    }
+
+    public function show(Book $book)
+    {
+        // Ambil semua review buku beserta nama user-nya
+        $reviews = $book->reviews()->with('user')->latest()->get();
+
+        // Kirim ke view
+        return view('catalog.show', compact('book', 'reviews'));
     }
 }

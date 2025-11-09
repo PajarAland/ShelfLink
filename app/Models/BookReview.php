@@ -5,25 +5,16 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Borrowing extends Model
+class BookReview extends Model
 {
     use HasFactory;
 
     protected $fillable = [
         'user_id',
         'book_id',
-        'borrow_date',
-        'return_date',
-        'return_deadline',
-        'status',
+        'rating',
+        'comment',
     ];
-
-    protected $casts = [
-    'borrow_date' => 'datetime',
-    'return_date' => 'datetime',
-    'return_deadline' => 'datetime',
-];
-
 
     public function user()
     {
@@ -35,3 +26,4 @@ class Borrowing extends Model
         return $this->belongsTo(Book::class);
     }
 }
+
