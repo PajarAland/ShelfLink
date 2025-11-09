@@ -56,6 +56,7 @@
                                     <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Tanggal Pinjam</th>
                                     <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Batas Pengembalian</th>
                                     <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
+                                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
@@ -90,10 +91,31 @@
                                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
                                                     Terlambat
                                                 </span>
+                                            @elseif ($borrow->status === 'pending')
+                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                                    Menunggu Konfirmasi
+                                                </span>
                                             @else
                                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
                                                     Dikembalikan
                                                 </span>
+                                            @endif
+                                        </td>
+
+                                        <!-- Action Buttons -->
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            @if ($borrow->status === 'borrowed' || $borrow->status === 'overdue')
+                                                <form action="{{ route('borrowings.return', $borrow->id) }}" method="POST" onsubmit="return confirm('Yakin ingin mengembalikan buku ini?')">
+                                                    @csrf
+                                                    <button type="submit" 
+                                                        class="inline-flex items-center px-3 py-1.5 bg-yellow-500 text-white text-xs font-semibold rounded hover:bg-yellow-600 transition">
+                                                        <i class="fas fa-undo mr-1"></i> Kembalikan
+                                                    </button>
+                                                </form>
+                                            @elseif ($borrow->status === 'pending')
+                                                <span class="text-sm text-yellow-600 font-medium">Menunggu konfirmasi admin...</span>
+                                            @else
+                                                <span class="text-sm text-green-600 font-medium">Selesai</span>
                                             @endif
                                         </td>
                                     </tr>
