@@ -11,21 +11,22 @@ use App\Models\Book;
  */
 class BorrowingFactory extends Factory
 {
-    public function definition(): array
-    {
-        $borrowDate = $this->faker->dateTimeBetween('-1 month', 'now');
-        $deadline = (clone $borrowDate)->modify('+7 days');
-        $isReturned = $this->faker->boolean(70); // 70% kemungkinan sudah dikembalikan
+   public function definition(): array
+{
+    $borrowDate = $this->faker->dateTimeBetween('-3 months', 'now');
+    $deadline = (clone $borrowDate)->modify('+14 days');
+    $isReturned = $this->faker->boolean(70);
 
-        return [
-            'user_id' => User::factory(),
-            'book_id' => Book::factory(),
-            'borrow_date' => $borrowDate,
-            'return_deadline' => $deadline,
-            'return_date' => $isReturned ? $this->faker->dateTimeBetween($borrowDate, $deadline) : null,
-            'status' => $isReturned
-                ? 'returned'
-                : ($this->faker->boolean(20) ? 'overdue' : 'borrowed'),
-        ];
-    }
+    return [
+        'book_id' => \App\Models\Book::factory(),
+        'user_id' => \App\Models\User::factory(),
+        'borrow_date' => $borrowDate,
+        'return_deadline' => $deadline,
+        'return_date' => $isReturned ? $this->faker->dateTimeBetween($borrowDate, $deadline) : null,
+        'status' => $isReturned
+            ? 'returned'
+            : ($this->faker->boolean(20) ? 'overdue' : 'borrowed'),
+    ];
+}
+
 }
