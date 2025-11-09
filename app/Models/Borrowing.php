@@ -18,6 +18,13 @@ class Borrowing extends Model
         'status',
     ];
 
+    protected $casts = [
+    'borrow_date' => 'datetime',
+    'return_date' => 'datetime',
+    'return_deadline' => 'datetime',
+];
+
+
     public function user()
     {
         return $this->belongsTo(User::class);
