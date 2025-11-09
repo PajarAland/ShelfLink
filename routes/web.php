@@ -8,15 +8,29 @@ use App\Http\Controllers\StatisticsController;
 use App\Http\Controllers\CatalogController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\DashboardController;
 
+
+// Route::get('/', function () {
+//     return view('welcome');
+// });
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('welcome', [
+        'bookCount' => \App\Models\Book::count(),
+        'readerCount' => \App\Models\User::where('role', 'user')->count(),
+        'featuredBook' => \App\Models\Book::inRandomOrder()->first(),
+    ]);
 });
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+
+// Route::get('/dashboard', function () {
+//     return view('dashboard');
+// })->middleware(['auth', 'verified'])->name('dashboard');
+
+Route::get('/dashboard', [DashboardController::class, 'index'])
+    ->middleware(['auth', 'verified'])
+    ->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
