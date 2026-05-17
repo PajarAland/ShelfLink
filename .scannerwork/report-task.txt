@@ -1,0 +1,6 @@
+projectKey=ShelfLink
+serverUrl=http://localhost:9000
+serverVersion=25.2.0.102705
+dashboardUrl=http://localhost:9000/dashboard?id=ShelfLink
+ceTaskId=074e37eb-4395-4e70-91bb-03c097e08c8e
+ceTaskUrl=http://localhost:9000/api/ce/task?id=074e37eb-4395-4e70-91bb-03c097e08c8e
