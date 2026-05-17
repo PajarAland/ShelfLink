@@ -17,12 +17,13 @@ class DashboardTest extends TestCase
         $response->assertRedirect('/login');
     }
 
-    public function test_authenticated_user_can_access_dashboard()
+    public function test_authenticated_user_dashboard_has_reader_percentage()
     {
         $user = User::factory()->create();
 
         $response = $this->actingAs($user)->get('/dashboard');
+
         $response->assertStatus(200);
-        $response->assertSee('Dashboard');
+        $response->assertViewHas('readerPercentage');
     }
 }

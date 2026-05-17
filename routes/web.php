@@ -33,6 +33,7 @@ Route::get('/dashboard', [DashboardController::class, 'index'])
     ->name('dashboard');
 
 Route::middleware('auth')->group(function () {
+    Route::resource('books', BookController::class);
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
@@ -49,7 +50,6 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::middleware(['auth', 'admin'])->group(function () {
-    Route::resource('books', BookController::class);
     Route::get('/admin/statistics', [StatisticsController::class, 'index'])->name('statistics.index');
     Route::get('/admin/returns', [ReturnController::class, 'index'])->name('admin.returns.index');
     Route::post('/admin/returns/{id}', [ReturnController::class, 'update'])->name('admin.returns.update');
