@@ -38,15 +38,16 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::resource('borrowings', BorrowingController::class)->only(['index', 'create', 'store']);
-    Route::post('/borrowings/{id}/return', [BorrowingController::class, 'returnBook']) ->name('borrowings.return');
-    Route::get('/borrowings/{id}/return', [BorrowingController::class, 'returnBook']);
-    Route::get('/borrowings/{id}/return', [BorrowingController::class, 'returnBook']);
     Route::get('/catalog', [CatalogController::class, 'index'])->name('catalog.index');
     Route::get('/catalog/{book}', [CatalogController::class, 'show'])->name('catalog.show');
     Route::post('/catalog/{book}/review', [ReviewController::class, 'store'])->name('reviews.store');
     Route::post('/books/{book}/reviews', [ReviewController::class, 'store'])->name('reviews.store');
     Route::get('/catalog/{book}', [BookController::class, 'show'])->name('catalog.show');
     Route::post('/reviews/{id}/vote', [ReviewController::class, 'vote'])->name('reviews.vote');
+    Route::get('/borrowings/{id}/return', [BorrowingController::class, 'showReturnForm'])
+    ->name('borrowings.return.form');
+    Route::post('/borrowings/{id}/return', [BorrowingController::class, 'returnBook'])
+    ->name('borrowings.return');
 });
 
 Route::middleware(['auth', 'admin'])->group(function () {

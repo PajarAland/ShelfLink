@@ -85,24 +85,51 @@ class BorrowingController extends Controller
     }
 
     // Proses pengembalian buku
-    public function returnBook($id)
-    {
-        $borrowing = Borrowing::with('book', 'user')->findOrFail($id);
+ public function returnBook(Request $request, $id)
+{
+    $request->validate([
+        'return_photos' => 'required',
+        'return_photos.*' => 'image|mimes:jpg,jpeg,png|max:2048',
+    ]);
 
-        if ($borrowing->status !== 'borrowed' && $borrowing->status !== 'overdue') {
-            return back()->with('error', 'Buku ini sudah dikembalikan sebelumnya.');
+    $borrowing = Borrowing::with('book', 'user')->findOrFail($id);
+
+    if (!in_array($borrowing->status, ['borrowed', 'overdue'])) {
+        return redirect()
+            ->route('borrowings.index')
+            ->with('error', 'Buku sudah dikembalikan.');
+    }
+
+    $photos = [];
+
+    if ($request->hasFile('return_photos')) {
+
+        foreach ($request->file('return_photos') as $photo) {
+
+            $path = $photo->store('return_photos', 'public');
+
+            $photos[] = $path;
         }
+    }
 
-        // Ubah status menjadi pending
-        $borrowing->update(['status' => 'pending']);
+    $borrowing->update([
+        'status' => 'pending',
+        'return_photos' => $photos,
+        'return_date' => now(),
+    ]);
 
-        // Tambahkan stok buku kembali
-        $borrowing->book->increment('stock');
+    Mail::to($borrowing->user->email)
+        ->send(new ReturnConfirmationMail($borrowing));
 
-        // Kirim email konfirmasi pengembalian
-        Mail::to($borrowing->user->email)->send(new ReturnConfirmationMail($borrowing));
+    return redirect()
+        ->route('borrowings.index')
+        ->with('success', 'Bukti pengembalian berhasil dikirim dan menunggu approval admin.');
+}
 
-        return back()->with('success', 'Buku berhasil dikembalikan dan menunggu konfirmasi admin.');
+    public function showReturnForm($id)
+    {
+        $borrowing = Borrowing::with('book')->findOrFail($id);
+        return view('borrowings.return', compact('borrowing'));
     }
 
 }
