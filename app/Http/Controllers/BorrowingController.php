@@ -89,7 +89,7 @@ class BorrowingController extends Controller
 {
     $request->validate([
         'return_photos' => 'required',
-        'return_photos.*' => 'image|mimes:jpg,jpeg,png|max:2048',
+        'return_photos.*' => 'image|mimes:jpg,jpeg,png|max:10240',
     ]);
 
     $borrowing = Borrowing::with('book', 'user')->findOrFail($id);
