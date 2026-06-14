@@ -154,6 +154,63 @@
                     <p class="mt-1 text-sm text-gray-500">Contoh: 2023</p>
                 </div>
 
+                <!-- Barcode Field -->
+<div class="mb-6">
+    <label for="barcode" class="block text-sm font-medium text-gray-700 mb-2">
+        <i class="fas fa-barcode mr-2 text-blue-500"></i>
+        Barcode Buku / ISBN
+    </label>
+
+    <!-- Barcode Input -->
+    <div class="relative">
+        <input 
+            type="text" 
+            id="barcode"
+            name="barcode" 
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+            placeholder="Upload foto barcode buku"
+            required
+        >
+
+        <div class="absolute inset-y-0 right-0 flex items-center pr-3">
+            <i class="fas fa-barcode text-blue-500"></i>
+        </div>
+    </div>
+
+    <!-- Upload Barcode -->
+    <div class="mt-4">
+        <label 
+            for="barcodeImage" 
+            class="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition-colors duration-200"
+        >
+
+            <div class="flex flex-col items-center justify-center pt-5 pb-6" id="barcode-upload-area">
+                <i class="fas fa-barcode text-gray-400 text-2xl mb-2"></i>
+
+                <p class="mb-1 text-sm text-gray-500">
+                    <span class="font-semibold">Klik untuk upload</span> foto barcode
+                </p>
+
+                <p class="text-xs text-gray-500">
+                    JPG, PNG barcode buku / ISBN
+                </p>
+            </div>
+
+            <input
+                id="barcodeImage"
+                type="file"
+                class="hidden"
+                accept="image/*"
+            />
+
+        </label>
+    </div>
+
+    <p class="mt-2 text-sm text-gray-500">
+        Upload foto barcode belakang buku untuk auto detect ISBN
+    </p>
+</div>
+
                 <!-- Stock Field -->
                 <div class="relative">
                         <input 
@@ -241,97 +298,84 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
-@endpush
+<!-- QUAGGA BARCODE SCANNER -->
+<script src="https://cdn.jsdelivr.net/npm/quagga/dist/quagga.min.js"></script>
 
-<!-- @push('scripts')
 <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const desc = document.getElementById('description');
-        const charCount = document.createElement('p');
-        charCount.className = 'text-sm text-gray-500 mt-1';
-        desc.insertAdjacentElement('afterend', charCount);
-        desc.addEventListener('input', () => charCount.textContent = desc.value.length + ' karakter');
+
+    const barcodeInput = document.getElementById('barcode');
+    const barcodeImage = document.getElementById('barcodeImage');
+
+    barcodeImage.addEventListener('change', (event) => {
+
+        const file = event.target.files[0];
+
+        if (!file) return;
+
+        const reader = new FileReader();
+
+        reader.onload = function(e) {
+
+            Quagga.decodeSingle({
+
+                src: e.target.result,
+
+                numOfWorkers: 0,
+
+                inputStream: {
+                    size: 1200
+                },
+
+                locator: {
+                    patchSize: "large",
+                    halfSample: false
+                },
+
+                decoder: {
+                    readers: [
+                        "ean_reader",
+                        "ean_8_reader",
+                        "upc_reader",
+                        "upc_e_reader",
+                        "code_128_reader"
+                    ]
+                },
+
+                locate: true
+
+            }, function(result) {
+
+                console.log('RESULT:', result);
+
+                if (result && result.codeResult) {
+
+                    barcodeInput.value = result.codeResult.code;
+
+                    // UPDATE UI
+                    document.getElementById('barcode-upload-area').innerHTML = `
+                        <i class="fas fa-check-circle text-green-500 text-3xl mb-2"></i>
+                        <p class="text-sm text-green-600 font-semibold">
+                            Barcode berhasil dibaca
+                        </p>
+                        <p class="text-xs text-gray-500 mt-1">
+                            ${result.codeResult.code}
+                        </p>
+                    `;
+
+                } else {
+
+                    alert('Barcode gagal dibaca');
+
+                }
+
+            });
+
+        };
+
+        reader.readAsDataURL(file);
+
     });
+
 </script>
-@endpush -->
-
-    <!-- <script>
-        // Form validation and interactivity
-        document.addEventListener('DOMContentLoaded', function() {
-            const titleInput = document.getElementById('title');
-            const authorInput = document.getElementById('author');
-            const descriptionInput = document.getElementById('description');
-            const charCount = document.getElementById('char-count');
-            const titleCheck = document.getElementById('title-check');
-            const authorCheck = document.getElementById('author-check');
-            const successMessage = document.getElementById('success-message');
-            const form = document.querySelector('form');
-
-            document.getElementById('cover').addEventListener('change', function(event) {
-                const file = event.target.files[0];
-                const previewArea = document.getElementById('cover-preview');
-                const uploadArea = document.getElementById('cover-upload-area');
-                const previewImage = document.getElementById('cover-preview-image');
-
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        previewImage.src = e.target.result;
-                        previewArea.classList.remove('hidden');
-                        uploadArea.classList.add('hidden');
-                    };
-                    reader.readAsDataURL(file);
-                }
-            });
-
-            document.getElementById('remove-cover').addEventListener('click', function() {
-                const coverInput = document.getElementById('cover');
-                coverInput.value = '';
-                document.getElementById('cover-preview').classList.add('hidden');
-                document.getElementById('cover-upload-area').classList.remove('hidden');
-            });
-            
-            // Update character count for description
-            descriptionInput.addEventListener('input', function() {
-                charCount.textContent = this.value.length + ' karakter';
-            });
-            
-            // Show checkmarks when required fields are filled
-            titleInput.addEventListener('input', function() {
-                if (this.value.trim().length > 0) {
-                    titleCheck.classList.remove('opacity-0');
-                } else {
-                    titleCheck.classList.add('opacity-0');
-                }
-            });
-            
-            authorInput.addEventListener('input', function() {
-                if (this.value.trim().length > 0) {
-                    authorCheck.classList.remove('opacity-0');
-                } else {
-                    authorCheck.classList.add('opacity-0');
-                }
-            });
-            
-            // Form submission simulation
-            form.addEventListener('submit', function(e) {
-                // e.preventDefault();
-                
-                // Show success message
-                successMessage.classList.remove('hidden');
-                
-                // Scroll to success message
-                successMessage.scrollIntoView({ behavior: 'smooth' });
-                
-                // Reset form after 3 seconds
-                setTimeout(() => {
-                    form.reset();
-                    charCount.textContent = '0 karakter';
-                    titleCheck.classList.add('opacity-0');
-                    authorCheck.classList.add('opacity-0');
-                    successMessage.classList.add('hidden');
-                }, 3000);
-            });
-        });
-    </script> -->
+@endpush
 </x-app-layout>

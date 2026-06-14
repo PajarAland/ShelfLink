@@ -45,6 +45,70 @@
                         @csrf
 
                         <!-- Book Search -->
+                         <!-- Upload Barcode -->
+<div class="mb-5">
+
+    <label class="block text-sm font-semibold text-gray-700 mb-2">
+        Scan Barcode Buku
+    </label>
+
+    <label 
+        for="barcodeImage"
+        class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition"
+    >
+
+        <div 
+            id="barcode-upload-area"
+            class="flex flex-col items-center justify-center"
+        >
+            <i class="fas fa-barcode text-3xl text-indigo-500 mb-2"></i>
+
+            <p class="text-sm text-gray-600 font-medium">
+                Klik untuk upload foto barcode
+            </p>
+
+            <p class="text-xs text-gray-400 mt-1">
+                Barcode buku / ISBN
+            </p>
+        </div>
+
+        <input
+            id="barcodeImage"
+            type="file"
+            accept="image/*"
+            class="hidden"
+        >
+    </label>
+
+</div>
+
+<!-- Camera Scanner -->
+<div class="mt-4">
+
+    <button
+        type="button"
+        id="startScannerBtn"
+        class="w-full flex items-center justify-center px-4 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition"
+    >
+        <i class="fas fa-camera mr-2"></i>
+        Scan Barcode via Camera
+    </button>
+
+    <!-- CAMERA PREVIEW -->
+    <!-- CAMERA PREVIEW -->
+<div 
+    id="scanner-container"
+    class="hidden mt-4 overflow-hidden rounded-xl border border-gray-300"
+>
+
+    <div
+        id="scanner-video"
+        class="w-full min-h-[300px] bg-black"
+    ></div>
+
+</div>
+
+</div>
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-2">
                                 Cari Buku <span class="text-red-500">*</span>
@@ -152,4 +216,226 @@
             </div>
         </div>
     </main>
+    @push('scripts')
+<!-- QUAGGA BARCODE -->
+<script src="https://cdn.jsdelivr.net/npm/quagga/dist/quagga.min.js"></script>
+
+<script>
+
+    const barcodeImage = document.getElementById('barcodeImage');
+
+    const startScannerBtn = document.getElementById('startScannerBtn');
+    const scannerContainer = document.getElementById('scanner-container');
+    const scannerVideo = document.getElementById('#scanner-video');
+
+    /*
+    |--------------------------------------------------------------------------
+    | FUNCTION FETCH BOOK
+    |--------------------------------------------------------------------------
+    */
+
+    function fetchBookByBarcode(barcode) {
+
+        console.log('BARCODE:', barcode);
+
+        fetch(`/books/barcode/${barcode}`)
+            .then(response => response.json())
+            .then(data => {
+
+                console.log('FETCH RESULT:', data);
+
+                if (data.success) {
+
+                    // SET BOOK ID
+                    document.querySelector('input[name="book_id"]').value = data.book.id;
+
+                    // SET SEARCH INPUT
+                    const searchInput = document.querySelector('input[x-model="search"]');
+
+                    if (searchInput) {
+                        searchInput.value = data.book.title;
+                    }
+
+                    // UPDATE UI
+                    document.getElementById('barcode-upload-area').innerHTML = `
+                        <i class="fas fa-check-circle text-green-500 text-3xl mb-2"></i>
+
+                        <p class="text-sm text-green-600 font-semibold">
+                            Buku ditemukan
+                        </p>
+
+                        <p class="text-xs text-gray-500 mt-1">
+                            ${data.book.title}
+                        </p>
+                    `;
+
+                } else {
+
+                    alert('Barcode ditemukan tapi buku tidak ada di database');
+
+                }
+
+            })
+            .catch(error => {
+
+                console.error(error);
+
+                alert('Gagal mengambil data buku');
+
+            });
+
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | IMAGE SCAN
+    |--------------------------------------------------------------------------
+    */
+
+    barcodeImage.addEventListener('change', (event) => {
+
+        const file = event.target.files[0];
+
+        if (!file) return;
+
+        const reader = new FileReader();
+
+        reader.onload = function(e) {
+
+            Quagga.decodeSingle({
+
+                src: e.target.result,
+
+                numOfWorkers: 0,
+
+                inputStream: {
+                    size: 1200
+                },
+
+                locator: {
+                    patchSize: "large",
+                    halfSample: false
+                },
+
+                decoder: {
+                    readers: [
+                        "ean_reader",
+                        "ean_8_reader",
+                        "upc_reader",
+                        "upc_e_reader",
+                        "code_128_reader"
+                    ]
+                },
+
+                locate: true
+
+            }, function(result) {
+
+                console.log('RESULT:', result);
+
+                if (result && result.codeResult) {
+
+                    fetchBookByBarcode(result.codeResult.code);
+
+                } else {
+
+                    alert('Barcode gagal dibaca');
+
+                }
+
+            });
+
+        };
+
+        reader.readAsDataURL(file);
+
+    });
+
+    /*
+    |--------------------------------------------------------------------------
+    | CAMERA SCAN
+    |--------------------------------------------------------------------------
+    */
+
+    startScannerBtn.addEventListener('click', () => {
+
+        scannerContainer.classList.remove('hidden');
+
+        Quagga.init({
+
+            inputStream: {
+                type: "LiveStream",
+
+                target: document.querySelector('#scanner-video'),
+
+                constraints: {
+                    facingMode: "environment",
+                    width: 1280,
+                    height: 720
+                }
+            },
+
+            locator: {
+                patchSize: "large",
+                halfSample: false
+            },
+
+            numOfWorkers: navigator.hardwareConcurrency || 4,
+
+            decoder: {
+                readers: [
+                    "ean_reader",
+                    "ean_8_reader",
+                    "upc_reader",
+                    "upc_e_reader",
+                    "code_128_reader"
+                ]
+            },
+
+            locate: true
+
+        }, function(err) {
+
+            if (err) {
+
+                console.error(err);
+
+                alert('Camera gagal diakses');
+
+                return;
+
+            }
+
+            console.log('Quagga started');
+
+            Quagga.start();
+
+        });
+
+    });
+
+    /*
+    |--------------------------------------------------------------------------
+    | DETECT BARCODE CAMERA
+    |--------------------------------------------------------------------------
+    */
+
+    Quagga.onDetected(function(result) {
+
+        const barcode = result.codeResult.code;
+
+        console.log('CAMERA BARCODE:', barcode);
+
+        // STOP CAMERA
+        Quagga.stop();
+
+        scannerContainer.classList.add('hidden');
+
+        // FETCH BOOK
+        fetchBookByBarcode(barcode);
+
+    });
+
+</script>
+@endpush
 </x-app-layout>
