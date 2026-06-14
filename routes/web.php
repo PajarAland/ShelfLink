@@ -9,6 +9,7 @@ use App\Http\Controllers\CatalogController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\DashboardController;
+use App\Models\Book;
 
 
 // Route::get('/', function () {
@@ -20,6 +21,22 @@ Route::get('/', function () {
         'bookCount' => \App\Models\Book::count(),
         'readerCount' => \App\Models\User::where('role', 'user')->count(),
         'featuredBook' => \App\Models\Book::inRandomOrder()->first(),
+    ]);
+});
+
+Route::get('/books/barcode/{barcode}', function ($barcode) {
+
+    $book = Book::where('barcode', $barcode)->first();
+
+    if (!$book) {
+        return response()->json([
+            'success' => false
+        ]);
+    }
+
+    return response()->json([
+        'success' => true,
+        'book' => $book
     ]);
 });
 

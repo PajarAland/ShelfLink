@@ -31,6 +31,7 @@ class BookController extends Controller
             'description' => 'nullable|string',
             'published_year' => 'nullable|digits:4|integer',
             'stock' => 'required|integer|min:1',
+            'barcode' => 'required|string|unique:books,barcode',
         ]);
 
         $coverPath = null;
@@ -50,6 +51,7 @@ class BookController extends Controller
             'description' => $request->description,
             'published_year' => $request->published_year,
             'stock' => $request->stock,
+            'barcode' => $request->barcode,
         ]);
 
         return redirect()->route('books.index')->with('success', 'Buku berhasil ditambahkan!');
@@ -71,6 +73,7 @@ class BookController extends Controller
             'published_year' => 'nullable|digits:4|integer',
             'stock' => 'required|integer|min:0',
             'cover' => 'nullable|image|mimes:jpeg,png,jpg|max:5120',
+            'barcode' => 'required|string|unique:books,barcode,' . $book->id,
         ]);
 
         $data = $request->only([
@@ -80,6 +83,7 @@ class BookController extends Controller
             'description',
             'published_year',
             'stock',
+            'barcode',
         ]);
 
         // Handle cover baru jika diupload

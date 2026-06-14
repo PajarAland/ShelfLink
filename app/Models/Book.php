@@ -18,6 +18,7 @@ class Book extends Model
         'description',
         'published_year',
         'stock',
+        'barcode',
     ];
 
     public function reviews()
