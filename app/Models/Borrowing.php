@@ -17,6 +17,10 @@ class Borrowing extends Model
     'return_deadline',
     'status',
     'return_photos',
+    'ai_damage_detected',
+    'ai_confidence',
+    'ai_damage_details',
+    'ai_suggested_fine',
 ];
 
     protected $casts = [

@@ -55,6 +55,7 @@
                                     <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Judul Buku</th>
                                     <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Tanggal Pinjam</th>
                                     <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Batas Pengembalian</th>
+                                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Analisis AI</th>
                                     <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
                                     <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Aksi</th>
                                 </tr>
@@ -79,6 +80,25 @@
                                             <div class="text-sm text-gray-900">
                                                 {{ \Carbon\Carbon::parse($borrow->return_deadline)->format('d M Y') }}
                                             </div>
+                                        </td>
+
+                                        <!-- AI Analysis -->
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            @if ($borrow->status === 'pending' || $borrow->status === 'returned')
+                                                @if ($borrow->ai_damage_detected === null)
+                                                    <span class="text-xs text-gray-400">Belum dianalisis</span>
+                                                @elseif ($borrow->ai_damage_detected)
+                                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-2xs font-medium bg-red-100 text-red-800" title="{{ $borrow->ai_damage_details }}">
+                                                        ⚠️ Rusak ({{ intval($borrow->ai_confidence * 100) }}%)
+                                                    </span>
+                                                @else
+                                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-2xs font-medium bg-green-100 text-green-800">
+                                                        ✅ OK ({{ intval($borrow->ai_confidence * 100) }}%)
+                                                    </span>
+                                                @endif
+                                            @else
+                                                <span class="text-xs text-gray-400">-</span>
+                                            @endif
                                         </td>
 
                                         <!-- Status -->

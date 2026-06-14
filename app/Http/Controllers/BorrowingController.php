@@ -112,10 +112,64 @@ class BorrowingController extends Controller
         }
     }
 
+    // Run AI Damage Detection on all uploaded return photos
+    $ai_damage_detected = false;
+    $max_confidence = 0.0;
+    $max_fine = 0;
+    $details_list = [];
+    $total_confidence = 0;
+    $analyzed_count = 0;
+
+    foreach ($photos as $index => $photoPath) {
+        try {
+            $absolutePath = storage_path('app/public/' . $photoPath);
+            if (file_exists($absolutePath)) {
+                // Call local Flask AI service
+                $response = \Illuminate\Support\Facades\Http::timeout(10)
+                    ->attach('image', file_get_contents($absolutePath), basename($photoPath))
+                    ->post('http://127.0.0.1:5000/detect');
+
+                if ($response->successful()) {
+                    $result = $response->json();
+                    $analyzed_count++;
+                    
+                    if (isset($result['is_damaged']) && $result['is_damaged'] === true) {
+                        $ai_damage_detected = true;
+                        if ($result['suggested_fine'] > $max_fine) {
+                            $max_fine = $result['suggested_fine'];
+                        }
+                        if ($result['confidence'] > $max_confidence) {
+                            $max_confidence = $result['confidence'];
+                        }
+                        $details_list[] = "Foto " . ($index + 1) . ": " . ($result['damage_details'] ?? 'Kerusakan terdeteksi');
+                    } else {
+                        $total_confidence += $result['confidence'] ?? 0.0;
+                    }
+                }
+            }
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error("AI damage analysis failed for photo {$photoPath}: " . $e->getMessage());
+        }
+    }
+
+    if ($ai_damage_detected) {
+        $ai_confidence = $max_confidence;
+        $ai_details = implode(". ", $details_list);
+        $ai_suggested_fine = $max_fine;
+    } else {
+        $ai_confidence = $analyzed_count > 0 ? round($total_confidence / $analyzed_count, 2) : null;
+        $ai_details = $analyzed_count > 0 ? "Semua foto terverifikasi dalam kondisi baik oleh AI." : "Analisis AI tidak dapat dijalankan.";
+        $ai_suggested_fine = 0;
+    }
+
     $borrowing->update([
         'status' => 'pending',
         'return_photos' => $photos,
         'return_date' => now(),
+        'ai_damage_detected' => $ai_damage_detected,
+        'ai_confidence' => $ai_confidence,
+        'ai_damage_details' => $ai_details,
+        'ai_suggested_fine' => $ai_suggested_fine,
     ]);
 
     Mail::to($borrowing->user->email)
