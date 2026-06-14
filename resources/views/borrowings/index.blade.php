@@ -105,12 +105,10 @@
                                         <!-- Action Buttons -->
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             @if ($borrow->status === 'borrowed' || $borrow->status === 'overdue')
-                                                <form action="{{ route('borrowings.return', $borrow->id) }}" method="POST" onsubmit="return confirm('Yakin ingin mengembalikan buku ini?')">
-                                                    @csrf
-                                                    <button type="submit" 
-                                                        class="inline-flex items-center px-3 py-1.5 bg-yellow-500 text-white text-xs font-semibold rounded hover:bg-yellow-600 transition">
-                                                        <i class="fas fa-undo mr-1"></i> Kembalikan
-                                                    </button>
+                                                <a href="{{ route('borrowings.return.form', $borrow->id) }}"
+   class="inline-flex items-center px-3 py-1.5 bg-yellow-500 text-white text-xs font-semibold rounded hover:bg-yellow-600 transition">
+    <i class="fas fa-undo mr-1"></i> Kembalikan
+</a>
                                                 </form>
                                             @elseif ($borrow->status === 'pending')
                                                 <span class="text-sm text-yellow-600 font-medium">Menunggu konfirmasi admin...</span>

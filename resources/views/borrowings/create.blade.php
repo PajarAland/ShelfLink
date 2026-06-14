@@ -123,7 +123,7 @@
                                 <input type="hidden" name="book_id" :value="selectedBook?.id">
 
                                 <!-- Search Results Dropdown -->
-                                <div x-show="search.length > 0" 
+                                <div x-show="search.length > 0 && !selectedBook"
                                      x-transition
                                      class="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto">
                                     <template x-for="book in books.filter(b => b.title.toLowerCase().includes(search.toLowerCase()))" :key="book.id">
