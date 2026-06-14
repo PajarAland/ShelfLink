@@ -24,7 +24,7 @@
                         {{ __('Borrowings') }}
                     </x-nav-link>
 
-                    <x-nav-link :href="route('admin.returns.index')" :active="request()->routeIs('admin.return.*')">
+                    <x-nav-link :href="route('admin.returns.index')" :active="request()->routeIs('admin.returns.*')">
                         {{ __('Returns') }}
                     </x-nav-link>
 
@@ -107,7 +107,7 @@
                 {{ __('Borrowings') }}
             </x-responsive-nav-link>
 
-            <x-responsive-nav-link :href="route('admin.returns.index')" :active="request()->routeIs('admin.return.*')">
+            <x-responsive-nav-link :href="route('admin.returns.index')" :active="request()->routeIs('admin.returns.*')">
                 {{ __('Returns') }}
             </x-responsive-nav-link>
 

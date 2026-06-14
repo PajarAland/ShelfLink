@@ -1,6 +1,5 @@
 <x-app-layout>
     @push('head')
-        <script src="https://cdn.tailwindcss.com"></script>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     @endpush
     
@@ -45,9 +44,87 @@
                 </div>
             @endif
 
-            <!-- Borrowings Table -->
+            <!-- Borrowings Container -->
             @if ($borrowings->count() > 0)
-                <div class="bg-white overflow-hidden shadow-sm rounded-lg">
+                <!-- Mobile Card Layout (Visible on Mobile Only) -->
+                <div class="block md:hidden space-y-4">
+                    @foreach ($borrowings as $borrow)
+                        <div class="bg-white p-5 rounded-lg shadow-sm border border-gray-200 flex flex-col space-y-3">
+                            <div class="flex justify-between items-start">
+                                <h3 class="font-bold text-gray-900 text-sm max-w-[70%]">
+                                    {{ $borrow->book->title }}
+                                </h3>
+                                <div>
+                                    @if ($borrow->status === 'borrowed')
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-2xs font-semibold bg-blue-100 text-blue-800">
+                                            Dipinjam
+                                        </span>
+                                    @elseif ($borrow->status === 'overdue')
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-2xs font-semibold bg-red-100 text-red-800">
+                                            Terlambat
+                                        </span>
+                                    @elseif ($borrow->status === 'pending')
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-2xs font-semibold bg-yellow-100 text-yellow-800">
+                                            Menunggu
+                                        </span>
+                                    @else
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-2xs font-semibold bg-green-100 text-green-800">
+                                            Selesai
+                                        </span>
+                                    @endif
+                                </div>
+                            </div>
+                            
+                            <div class="grid grid-cols-2 gap-4 text-xs text-gray-600">
+                                <div>
+                                    <span class="text-gray-400 block mb-0.5">Tgl Pinjam</span>
+                                    <span class="font-semibold text-gray-800">{{ \Carbon\Carbon::parse($borrow->borrow_date)->format('d M Y') }}</span>
+                                </div>
+                                <div>
+                                    <span class="text-gray-400 block mb-0.5">Tenggat</span>
+                                    <span class="font-semibold text-gray-800">{{ \Carbon\Carbon::parse($borrow->return_deadline)->format('d M Y') }}</span>
+                                </div>
+                            </div>
+
+                            <div class="border-t pt-3 flex items-center justify-between">
+                                <div class="text-xs">
+                                    <span class="text-gray-400 block mb-0.5">Analisis AI:</span>
+                                    @if ($borrow->status === 'pending' || $borrow->status === 'returned')
+                                        @if ($borrow->ai_damage_detected === null)
+                                            <span class="text-gray-400">Belum dianalisis</span>
+                                        @elseif ($borrow->ai_damage_detected)
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded text-3xs font-semibold bg-red-100 text-red-800" title="{{ $borrow->ai_damage_details }}">
+                                                ⚠️ Rusak ({{ intval($borrow->ai_confidence * 100) }}%)
+                                            </span>
+                                        @else
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded text-3xs font-semibold bg-green-100 text-green-800">
+                                                ✅ OK ({{ intval($borrow->ai_confidence * 100) }}%)
+                                            </span>
+                                        @endif
+                                    @else
+                                        <span class="text-gray-400">-</span>
+                                    @endif
+                                </div>
+                                
+                                <div class="flex items-center">
+                                    @if ($borrow->status === 'borrowed' || $borrow->status === 'overdue')
+                                        <a href="{{ route('borrowings.return.form', $borrow->id) }}"
+                                           class="inline-flex items-center px-3 py-1.5 bg-yellow-500 text-white text-xs font-bold rounded hover:bg-yellow-600 transition">
+                                            <i class="fas fa-undo mr-1"></i> Kembalikan
+                                        </a>
+                                    @elseif ($borrow->status === 'pending')
+                                        <span class="text-xs text-yellow-600 font-semibold">Review Admin</span>
+                                    @else
+                                        <span class="text-xs text-green-600 font-semibold"><i class="fas fa-check-double mr-0.5"></i> Selesai</span>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+
+                <!-- Desktop Table Layout (Visible on Desktop Only) -->
+                <div class="hidden md:block bg-white overflow-hidden shadow-sm rounded-lg">
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-gray-200">
                             <thead class="bg-gray-50">
@@ -126,10 +203,9 @@
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             @if ($borrow->status === 'borrowed' || $borrow->status === 'overdue')
                                                 <a href="{{ route('borrowings.return.form', $borrow->id) }}"
-   class="inline-flex items-center px-3 py-1.5 bg-yellow-500 text-white text-xs font-semibold rounded hover:bg-yellow-600 transition">
-    <i class="fas fa-undo mr-1"></i> Kembalikan
-</a>
-                                                </form>
+                                                   class="inline-flex items-center px-3 py-1.5 bg-yellow-500 text-white text-xs font-semibold rounded hover:bg-yellow-600 transition">
+                                                    <i class="fas fa-undo mr-1"></i> Kembalikan
+                                                </a>
                                             @elseif ($borrow->status === 'pending')
                                                 <span class="text-sm text-yellow-600 font-medium">Menunggu konfirmasi admin...</span>
                                             @else
