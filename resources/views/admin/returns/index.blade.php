@@ -79,6 +79,10 @@
                                     </th>
 
                                     <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">
+                                        Analisis AI
+                                    </th>
+
+                                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">
                                         Status
                                     </th>
 
@@ -163,6 +167,40 @@
 
                                         </td>
 
+                                        <!-- AI Analysis -->
+                                        <td class="px-6 py-4">
+                                            @if ($borrow->status === 'pending' || $borrow->status === 'returned')
+                                                @if ($borrow->ai_damage_detected === null)
+                                                    <span class="text-sm text-gray-400">Belum dianalisis</span>
+                                                @elseif ($borrow->ai_damage_detected)
+                                                    <div class="space-y-1">
+                                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800 font-semibold">
+                                                            <i class="fas fa-exclamation-triangle mr-1 text-red-500 animate-pulse"></i>
+                                                            Terdeteksi Rusak ({{ intval($borrow->ai_confidence * 100) }}%)
+                                                        </span>
+                                                        <p class="text-xs text-gray-600 max-w-xs break-words" title="{{ $borrow->ai_damage_details }}">
+                                                            {{ Str::limit($borrow->ai_damage_details, 60) }}
+                                                        </p>
+                                                        <p class="text-xs font-bold text-amber-600">
+                                                            Rekomendasi Denda: Rp{{ number_format($borrow->ai_suggested_fine, 0, ',', '.') }}
+                                                        </p>
+                                                    </div>
+                                                @else
+                                                    <div class="space-y-1">
+                                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800 font-semibold">
+                                                            <i class="fas fa-check-circle mr-1 text-green-500"></i>
+                                                            Kondisi Baik ({{ intval($borrow->ai_confidence * 100) }}%)
+                                                        </span>
+                                                        <p class="text-xs text-gray-400 max-w-xs break-words">
+                                                            {{ Str::limit($borrow->ai_damage_details, 60) }}
+                                                        </p>
+                                                    </div>
+                                                @endif
+                                            @else
+                                                <span class="text-sm text-gray-400">-</span>
+                                            @endif
+                                        </td>
+
                                         <!-- Status -->
                                         <td class="px-6 py-4 whitespace-nowrap">
 
@@ -209,8 +247,10 @@
                                                     <input type="number"
                                                            name="fine"
                                                            placeholder="Denda"
+                                                           value="{{ $borrow->ai_suggested_fine }}"
                                                            min="0"
-                                                           class="w-24 px-2 py-1 text-sm border rounded-md focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                                                           class="w-24 px-2 py-1 text-sm border rounded-md focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                                                           title="Rekomendasi denda AI: Rp{{ number_format($borrow->ai_suggested_fine, 0, ',', '.') }}">
 
                                                     <button type="submit"
                                                             onclick="return confirm('Approve pengembalian buku ini?')"
