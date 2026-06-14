@@ -16,21 +16,25 @@
                         {{ __('Dashboard') }}
                     </x-nav-link>
 
-                    <x-nav-link :href="route('books.index')" :active="request()->routeIs('books.*')">
-                        {{ __('Books') }}
-                    </x-nav-link>
+                    @if(Auth::user()->role === 'admin')
+                        <x-nav-link :href="route('books.index')" :active="request()->routeIs('books.*')">
+                            {{ __('Books') }}
+                        </x-nav-link>
+                    @endif
 
                     <x-nav-link :href="route('borrowings.index')" :active="request()->routeIs('borrowings.*')">
                         {{ __('Borrowings') }}
                     </x-nav-link>
 
-                    <x-nav-link :href="route('admin.returns.index')" :active="request()->routeIs('admin.returns.*')">
-                        {{ __('Returns') }}
-                    </x-nav-link>
+                    @if(Auth::user()->role === 'admin')
+                        <x-nav-link :href="route('admin.returns.index')" :active="request()->routeIs('admin.returns.*')">
+                            {{ __('Returns') }}
+                        </x-nav-link>
 
-                    <x-nav-link :href="route('statistics.index')" :active="request()->routeIs('statistics.*')">
-                        {{ __('Statistics') }}
-                    </x-nav-link>
+                        <x-nav-link :href="route('statistics.index')" :active="request()->routeIs('statistics.*')">
+                            {{ __('Statistics') }}
+                        </x-nav-link>
+                    @endif
 
                     <x-nav-link :href="route('catalog.index')" :active="request()->routeIs('catalog.*')">
                         {{ __('Catalog') }}
@@ -99,21 +103,25 @@
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
 
-            <x-responsive-nav-link :href="route('books.index')" :active="request()->routeIs('books.*')">
-                {{ __('Books') }}
-            </x-responsive-nav-link>
+            @if(Auth::user()->role === 'admin')
+                <x-responsive-nav-link :href="route('books.index')" :active="request()->routeIs('books.*')">
+                    {{ __('Books') }}
+                </x-responsive-nav-link>
+            @endif
 
             <x-responsive-nav-link :href="route('borrowings.index')" :active="request()->routeIs('borrowings.*')">
                 {{ __('Borrowings') }}
             </x-responsive-nav-link>
 
-            <x-responsive-nav-link :href="route('admin.returns.index')" :active="request()->routeIs('admin.returns.*')">
-                {{ __('Returns') }}
-            </x-responsive-nav-link>
+            @if(Auth::user()->role === 'admin')
+                <x-responsive-nav-link :href="route('admin.returns.index')" :active="request()->routeIs('admin.returns.*')">
+                    {{ __('Returns') }}
+                </x-responsive-nav-link>
 
-            <x-responsive-nav-link :href="route('statistics.index')" :active="request()->routeIs('statistics.*')">
-                {{ __('Statistics') }}
-            </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('statistics.index')" :active="request()->routeIs('statistics.*')">
+                    {{ __('Statistics') }}
+                </x-responsive-nav-link>
+            @endif
 
             <x-responsive-nav-link :href="route('catalog.index')" :active="request()->routeIs('catalog.*')">
                 {{ __('Catalog') }}
