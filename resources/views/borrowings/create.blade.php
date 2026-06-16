@@ -39,7 +39,11 @@
                 <div class="p-6">
                     <form action="{{ route('borrowings.store') }}" method="POST" 
                           class="space-y-6" 
-                          x-data="{ search: '', selectedBook: null, books: @js($books) }">
+                          x-data="{ 
+                              search: @js(optional($books->firstWhere('id', request('book_id')))->title ?? ''), 
+                              selectedBook: @js($books->firstWhere('id', request('book_id'))), 
+                              books: @js($books) 
+                          }">
                         @csrf
 
                         <!-- Book Search -->

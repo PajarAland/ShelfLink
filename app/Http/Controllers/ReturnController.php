@@ -38,13 +38,6 @@ class ReturnController extends Controller
     }
 
     $returnDate = now();
-    $borrowing->update([
-        'status' => 'returned',
-        'return_date' => $returnDate,
-    ]);
-
-    // Tambahkan stok buku kembali
-    $borrowing->book->increment('stock');
 
     // Hitung keterlambatan
     $lateDays = 0;
@@ -57,6 +50,17 @@ class ReturnController extends Controller
     // Ambil denda dari input
     $damageFine = (int) $request->fine;
     $totalFine = $lateFine + $damageFine;
+
+    $borrowing->update([
+        'status' => 'returned',
+        'return_date' => $returnDate,
+        'late_fine' => $lateFine,
+        'damage_fine' => $damageFine,
+        'total_fine' => $totalFine,
+    ]);
+
+    // Tambahkan stok buku kembali
+    $borrowing->book->increment('stock');
 
     try {
         Mail::to($borrowing->user->email)->send(
@@ -81,25 +85,34 @@ class ReturnController extends Controller
     {
         $borrowing = Borrowing::with('book')->findOrFail($id);
 
-        if ($borrowing->status !== 'returned') {
-            return redirect()->back()->with('error', 'Data bukan status returned.');
+        if (!in_array($borrowing->status, ['returned', 'pending'])) {
+            return redirect()->back()->with('error', 'Data bukan status returned atau pending.');
         }
 
         $status = now()->gt($borrowing->return_deadline)
             ? 'overdue'
             : 'borrowed';
 
+        $previousStatus = $borrowing->status;
+
         $borrowing->update([
             'status' => $status,
             'return_date' => null,
+            'return_photos' => null,
+            'ai_damage_detected' => null,
+            'ai_confidence' => null,
+            'ai_damage_details' => null,
+            'ai_suggested_fine' => null,
         ]);
 
-        // Kurangi stok buku
-        if ($borrowing->book->stock > 0) {
+        // Kurangi stok buku hanya jika status sebelumnya adalah 'returned'
+        if ($previousStatus === 'returned' && $borrowing->book->stock > 0) {
             $borrowing->book->decrement('stock');
         }
 
+        $actionText = $previousStatus === 'pending' ? 'ditolak' : 'dibatalkan';
+
         return redirect()->route('admin.returns.index')
-            ->with('success', 'Pengembalian dibatalkan dan status dikembalikan ke "' . $status . '".');
+            ->with('success', 'Pengembalian ' . $actionText . ' dan status dikembalikan ke "' . $status . '".');
     }
 }

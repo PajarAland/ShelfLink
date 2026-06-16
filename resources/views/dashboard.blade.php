@@ -236,7 +236,7 @@
             <!-- ================= STANDARD USER DASHBOARD ================= -->
             
             <!-- User Stats Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <!-- My Borrowed Books -->
                 <div class="group relative overflow-hidden bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-2xl p-6 text-white shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-300">
                     <div class="absolute -right-6 -top-6 w-24 h-24 bg-white/10 rounded-full"></div>
@@ -285,6 +285,21 @@
                         </div>
                         <h3 class="text-4xl font-bold mb-2">{{ $totalAvailableBooks }}</h3>
                         <p class="text-emerald-100 text-sm font-medium">Total Books in ShelfLink</p>
+                    </div>
+                </div>
+
+                <!-- Total Fines -->
+                <div class="group relative overflow-hidden bg-gradient-to-br from-amber-500 to-amber-600 rounded-2xl p-6 text-white shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-300">
+                    <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-white/10 rounded-full"></div>
+                    <div class="absolute -left-2 -top-2 w-16 h-16 bg-white/5 rounded-full"></div>
+                    
+                    <div class="relative z-10">
+                        <div class="flex items-center justify-between mb-4">
+                            <i class="fas fa-coins text-2xl opacity-85"></i>
+                            <div class="text-white/70 text-xs font-semibold uppercase tracking-wider font-mono">My Fines</div>
+                        </div>
+                        <h3 class="text-4xl font-bold mb-2">Rp{{ number_format($myTotalFines, 0, ',', '.') }}</h3>
+                        <p class="text-amber-100 text-sm font-medium">Accumulated Fine Fees</p>
                     </div>
                 </div>
             </div>

@@ -69,7 +69,11 @@ class BorrowingTest extends TestCase
             'borrow_date' => now()->subDays(5),
         ]);
 
-        $response = $this->actingAs($user)->post("/borrowings/{$borrowing->id}/return");
+        $response = $this->actingAs($user)->post("/borrowings/{$borrowing->id}/return", [
+            'return_photos' => [
+                \Illuminate\Http\UploadedFile::fake()->image('photo.jpg')
+            ]
+        ]);
 
         $response->assertRedirect();
         $this->assertDatabaseHas('borrowings', [
@@ -77,8 +81,8 @@ class BorrowingTest extends TestCase
             'status' => 'pending',
         ]);
 
-        // Pastikan stok buku bertambah kembali
-        $this->assertEquals(2, Book::find($book->id)->stock);
+        // Pastikan stok buku tetap (belum bertambah karena status masih pending)
+        $this->assertEquals(1, Book::find($book->id)->stock);
 
         Mail::assertSent(ReturnConfirmationMail::class);
     }

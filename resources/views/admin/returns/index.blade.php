@@ -311,7 +311,8 @@
 
                                                 <div class="flex flex-col items-center gap-2">
                                                     <!-- Approve Form -->
-                                                    <form action="{{ route('admin.returns.update', $borrow->id) }}"
+                                                    <form id="approve-form-{{ $borrow->id }}" 
+                                                          action="{{ route('admin.returns.update', $borrow->id) }}"
                                                           method="POST"
                                                           class="w-full">
 
@@ -347,30 +348,26 @@
                                                                 <button type="submit"
                                                                         onclick="return confirm('Approve pengembalian buku ini?')"
                                                                         class="flex-1 inline-flex items-center justify-center px-3 py-2 text-xs font-semibold rounded-lg text-green-700 bg-green-50 border border-green-200 hover:bg-green-100 hover:border-green-300 transition-all duration-200">
-
                                                                     <i class="fas fa-check mr-1"></i>
                                                                     Approve
-
                                                                 </button>
 
-                                                                <form action="{{ route('admin.returns.revert', $borrow->id) }}"
-                                                                      method="POST"
-                                                                      class="flex-1">
-
-                                                                    @csrf
-
-                                                                    <button type="submit"
-                                                                            onclick="return confirm('Tolak pengembalian buku ini?')"
-                                                                            class="w-full inline-flex items-center justify-center px-3 py-2 text-xs font-semibold rounded-lg text-red-700 bg-red-50 border border-red-200 hover:bg-red-100 hover:border-red-300 transition-all duration-200">
-
-                                                                        <i class="fas fa-times mr-1"></i>
-                                                                        Reject
-
-                                                                    </button>
-
-                                                                </form>
+                                                                <button type="button"
+                                                                        onclick="if(confirm('Tolak pengembalian buku ini?')) { document.getElementById('reject-form-{{ $borrow->id }}').submit(); }"
+                                                                        class="flex-1 inline-flex items-center justify-center px-3 py-2 text-xs font-semibold rounded-lg text-red-700 bg-red-50 border border-red-200 hover:bg-red-100 hover:border-red-300 transition-all duration-200">
+                                                                    <i class="fas fa-times mr-1"></i>
+                                                                    Reject
+                                                                </button>
                                                             </div>
                                                         </div>
+                                                    </form>
+
+                                                    <!-- Reject Form (Separate) -->
+                                                    <form id="reject-form-{{ $borrow->id }}"
+                                                          action="{{ route('admin.returns.revert', $borrow->id) }}"
+                                                          method="POST"
+                                                          class="hidden">
+                                                        @csrf
                                                     </form>
                                                 </div>
 

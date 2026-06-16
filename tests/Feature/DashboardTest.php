@@ -19,7 +19,7 @@ class DashboardTest extends TestCase
 
     public function test_authenticated_user_dashboard_has_reader_percentage()
     {
-        $user = User::factory()->create();
+        $user = User::factory()->create(['role' => 'admin']);
 
         $response = $this->actingAs($user)->get('/dashboard');
 

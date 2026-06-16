@@ -70,6 +70,7 @@ class DashboardController extends Controller
                 ->latest()
                 ->get();
             $totalAvailableBooks = Book::count();
+            $myTotalFines = Borrowing::where('user_id', $user->id)->sum('total_fine');
 
             return view('dashboard', [
                 'role' => 'user',
@@ -77,7 +78,8 @@ class DashboardController extends Controller
                 'myBorrowedCount' => $myBorrowedCount,
                 'myOverdueCount' => $myOverdueCount,
                 'myActiveBorrowings' => $myActiveBorrowings,
-                'totalAvailableBooks' => $totalAvailableBooks
+                'totalAvailableBooks' => $totalAvailableBooks,
+                'myTotalFines' => $myTotalFines
             ]);
         }
     }

@@ -21,6 +21,9 @@ class Borrowing extends Model
     'ai_confidence',
     'ai_damage_details',
     'ai_suggested_fine',
+    'late_fine',
+    'damage_fine',
+    'total_fine',
 ];
 
     protected $casts = [

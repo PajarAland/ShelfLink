@@ -104,6 +104,12 @@
                                     @else
                                         <span class="text-gray-400">-</span>
                                     @endif
+
+                                    @if($borrow->total_fine > 0)
+                                        <div class="mt-1.5 p-1 bg-red-50 border border-red-100 rounded text-[10px] text-red-700">
+                                            <i class="fas fa-coins mr-0.5"></i> Denda: <strong>Rp{{ number_format($borrow->total_fine, 0, ',', '.') }}</strong>
+                                        </div>
+                                    @endif
                                 </div>
                                 
                                 <div class="flex items-center">
@@ -133,6 +139,7 @@
                                     <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Tanggal Pinjam</th>
                                     <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Batas Pengembalian</th>
                                     <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Analisis AI</th>
+                                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Denda</th>
                                     <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
                                     <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Aksi</th>
                                 </tr>
@@ -173,6 +180,20 @@
                                                         ✅ OK ({{ intval($borrow->ai_confidence * 100) }}%)
                                                     </span>
                                                 @endif
+                                            @else
+                                                <span class="text-xs text-gray-400">-</span>
+                                            @endif
+                                        </td>
+
+                                        <!-- Denda -->
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            @if ($borrow->total_fine > 0)
+                                                <div class="text-sm font-semibold text-red-600">
+                                                    Rp{{ number_format($borrow->total_fine, 0, ',', '.') }}
+                                                </div>
+                                                <div class="text-[10px] text-gray-400">
+                                                    Late: Rp{{ number_format($borrow->late_fine, 0, ',', '.') }} | Damage: Rp{{ number_format($borrow->damage_fine, 0, ',', '.') }}
+                                                </div>
                                             @else
                                                 <span class="text-xs text-gray-400">-</span>
                                             @endif

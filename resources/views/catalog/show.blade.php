@@ -50,7 +50,7 @@
                     
                     <!-- Action Button -->
                     <div class="p-6">
-                        <a href="{{ route('borrowings.create') }}" 
+                        <a href="{{ route('borrowings.create', ['book_id' => $book->id]) }}" 
                         class="w-full inline-flex items-center justify-center px-6 py-3 bg-indigo-600 border border-transparent rounded-lg font-semibold text-sm text-white uppercase tracking-widest hover:bg-indigo-700 transition disabled:opacity-50 disabled:cursor-not-allowed
                         {{ $book->stock <= 0 ? 'pointer-events-none opacity-50' : '' }}">
                             <i class="fas fa-book-open mr-2"></i> 

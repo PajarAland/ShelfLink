@@ -21,6 +21,7 @@ class BooksTest extends TestCase
             'description',
             'published_year',
             'stock',
+            'barcode',
         ], $book->getFillable());
     }
 

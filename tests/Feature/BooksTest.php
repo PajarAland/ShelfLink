@@ -56,6 +56,7 @@ class BooksTest extends TestCase
             'description' => 'desc',
             'published_year' => '2020',
             'stock' => 3,
+            'barcode' => '1234567890',
         ]);
 
         $response->assertRedirect('/books');
